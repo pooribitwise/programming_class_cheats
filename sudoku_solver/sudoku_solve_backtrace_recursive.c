@@ -37,49 +37,49 @@ void draw(int **puzzle, bool **guess)
 }
 
 /* find the next blank cell to solve */
-int find_free(int *x, int *y, int **puzzle)
+bool find_free(int *x, int *y, int **puzzle)
 {
 	FOR(i)
 		FOR(j)
 			if (! puzzle[i][j]) {
 				*x = i;
 				*y = j;
-				return 1;
+				return true;
 			}
-	return 0;
+	return false;
 }
 
 /* check if n can be placed in row x and col y */
-int is_valid(int n, int x, int y, int **puzzle)
+bool is_valid(int n, int x, int y, int **puzzle)
 {
 	FOR(i)
 		if (puzzle[x][i] == n || puzzle[i][y] == n)
-			return 0;
+			return false;
 
 	int x_square = x / SUB * SUB;
 	int y_square = y / SUB * SUB;
 	for (int i = x_square; i < x_square + SUB; ++i) 
 		for (int j = y_square; j < y_square + SUB; ++j)
 			if (puzzle[i][j] == n)
-				return 0;
-	return 1;
+				return false;
+	return true;
 }
 
 /* solves the table using recursions */
-int solve(int **puzzle)
+bool solve(int **puzzle)
 {
 	int x, y;
 	if (!find_free(&x, &y, puzzle))
-		return 1;
+		return true;
 
 	for(int i = 1; i <= 9; ++i)
 		if (is_valid(i, x, y, puzzle)) {
 			puzzle[x][y] = i;
 			if (solve(puzzle))
-				return 1;
+				return true;
 			puzzle[x][y] = 0;
 		}
-	return 0;
+	return false;
 }
 
 int main (void)
