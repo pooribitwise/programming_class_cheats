@@ -61,16 +61,16 @@ int find_free(int *x, int *y)
 	return 0;
 }
 
-char is_valid(int n, int x, int y)
+int is_valid(int n, int x, int y)
 {
-	for (int i=0; i<9; i++)
+	FOR(i)
 		if (puzzle[x][i] == n || puzzle[i][y] == n)
 			return 0;
 
-	int x_square = (x/3) * 3;
-	int y_square = (y/3) * 3;
-	for (int i=x_square; i<x_square+3; i++) 
-		for (int j=y_square; j<y_square+3; j++)
+	int x_square = x / SUB * SUB;
+	int y_square = y / SUB * SUB;
+	for (int i = x_square; i < x_square + SUB; ++i) 
+		for (int j = y_square; j < y_square + SUB; ++j)
 			if (puzzle[i][j] == n)
 				return 0;
 	return 1;
