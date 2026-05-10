@@ -7,8 +7,8 @@
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
 
-int DIM;	// table length
-int SUB;	// sub square length
+static int DIM;	// table length
+static int SUB;	// sub square length
 
 /* print the board including the division */
 void print_board(int **puzzle, bool **guess)
@@ -61,31 +61,50 @@ bool is_valid(int n, int x, int y, int **puzzle)
 	return true;
 }
 
+typedef struct {
+	int x;
+	int y;
+	int options;	// options available
+} Cell;
+
+
+int cell_cmp(const void *a, const void *b) {
+    return ((Cell *) a) -> options - ((Cell *) b) -> options;
+}
+
+static Cell *order;
+static int pos = 0, numblanks;
+
 /* find the next blank cell to solve */
-bool find_blank(int *x, int *y, int **puzzle)
+Cell *find_blanks(int **puzzle)
 {
-	FOR(i)
-		FOR(j)
-			if (! puzzle[i][j]) {
-				*x = i;
-				*y = j;
-				return true;
-			}
-	return false;
+	Cell *blanks = malloc(DIM * DIM * sizeof(Cell));
+	int count = 0;
+	FOR(i) FOR(j) if (!puzzle[i][j]) {
+		int opts = 0;
+		for (int n = 1; n <= DIM; ++n)
+			if (is_valid(n, i, j, puzzle)) ++opts;
+		blanks[count++] = (Cell) {i, j, opts};
+	}
+	qsort(blanks, count, sizeof(Cell), cell_cmp);
+	numblanks = count;
+	return blanks;
 }
 
 /* solves the table using recursions */
 bool solve(int **puzzle)
 {
-	int x, y;
-	if (!find_blank(&x, &y, puzzle))
+	if (pos >= numblanks)
 		return true;
 
+	int x = order[pos].x, y = order[pos].y;
 	for(int i = 1; i <= DIM; ++i)
 		if (is_valid(i, x, y, puzzle)) {
 			puzzle[x][y] = i;
+			++pos;
 			if (solve(puzzle))
 				return true;
+			--pos;
 			puzzle[x][y] = 0;
 		}
 	return false;
@@ -118,6 +137,9 @@ int main (void)
 	}
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
 
+	order = find_blanks(puzzle);
+	pos = 0;
+
 	if (solve(puzzle))
 		print_board(puzzle, guess);
 	else
@@ -130,5 +152,6 @@ int main (void)
 	}
 	free(puzzle);
 	free(guess);
+	free(order);
 	return 0;
 }
