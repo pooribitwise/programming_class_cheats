@@ -39,11 +39,7 @@ void draw()
 			// set output color to print guessed cells in different color
 			if (guess[i][j])
 				printf("\033[32m");
-			
-			printf("%d", puzzle[i][j]);
-
-			// reset the output color
-			printf("\033[0m");
+			printf("%d\033[0m", puzzle[i][j]);
 		}
 		puts("|");
 	}
