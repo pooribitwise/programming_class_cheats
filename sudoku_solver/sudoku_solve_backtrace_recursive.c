@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* making ANSI escape codes windows compatible */
+#ifdef __linux__
+	#define GREEN   "\033[32m"
+	#define RESET   "\033[0m"
+#else
+	#define GREEN ""
+	#define RESET ""
+#endif
 
 #define FORMAT_BUFF 13 // max int possible charachters + 3, could be 5 but warnings should have been silenced
 
@@ -37,9 +45,9 @@ void print_board(int **puzzle, bool **guess)
 		putchar(!(j % SUB) ? '|' : ' ');
 			// set output color to print guessed cells in different color
 			if (guess[i][j])
-				printf("\033[32m");
+				printf(GREEN);
 			printf(strformat, puzzle[i][j]);
-			printf("\033[0m");
+			printf(RESET);
 		}
 		puts("|");
 	}
