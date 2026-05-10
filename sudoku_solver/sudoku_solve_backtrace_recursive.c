@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+
+#define FORMAT_BUFF 13 // max int possible charachters + 3, could be 5 but warnings should have been silenced
+
 /* adding a macro for for loops iterating columns or rows */
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
@@ -17,8 +20,8 @@ void print_board(int **puzzle, bool **guess)
 	int cell_width = 0;
 	for (int tmp = DIM; tmp > 0; tmp /= 10)
 		++cell_width;
-	// making number width dynamic 5 chars are adequate upto 99 digits!
-	char strformat[5];
+	// making number width dynamic to be like "%(char width)d"
+	char strformat[FORMAT_BUFF];
 	sprintf(strformat, "%%%dd", cell_width);
 	FOR (i) {
 		/* assuming the valid cell values are one digit, one for cell value
@@ -61,15 +64,19 @@ bool is_valid(int n, int x, int y, int **puzzle)
 	return true;
 }
 
+/* defining a type for storing each blank cell cordinates and valid choices */
 typedef struct {
 	int x;
 	int y;
 	int options;	// options available
 } Cell;
 
-
+/* compare blank cells from least to most valid choices */
 int cell_cmp(const void *a, const void *b) {
-    return ((Cell *) a) -> options - ((Cell *) b) -> options;
+    Cell *ca = (Cell *) a, *cb = (Cell *) b;
+    if (ca -> options < cb -> options) return -1;
+    if (ca -> options > cb -> options) return  1;
+    return 0;
 }
 
 static Cell *order;
@@ -138,9 +145,11 @@ int main (void)
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
 
 	order = find_blanks(puzzle);
+	if (!order) return 1;
 	pos = 0;
 
-	if (solve(puzzle))
+	bool solved = solve(puzzle);
+	if (solved)
 		print_board(puzzle, guess);
 	else
 		printf("I can not solve it! wow...\n");
