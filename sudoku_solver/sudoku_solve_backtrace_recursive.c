@@ -45,19 +45,6 @@ void print_board(int **puzzle, bool **guess)
 	putchar('\n');
 }
 
-/* find the next blank cell to solve */
-bool find_blank(int *x, int *y, int **puzzle)
-{
-	FOR(i)
-		FOR(j)
-			if (! puzzle[i][j]) {
-				*x = i;
-				*y = j;
-				return true;
-			}
-	return false;
-}
-
 /* check if n can be placed in row x and col y */
 bool is_valid(int n, int x, int y, int **puzzle)
 {
@@ -72,6 +59,19 @@ bool is_valid(int n, int x, int y, int **puzzle)
 			if (puzzle[i][j] == n)
 				return false;
 	return true;
+}
+
+/* find the next blank cell to solve */
+bool find_blank(int *x, int *y, int **puzzle)
+{
+	FOR(i)
+		FOR(j)
+			if (! puzzle[i][j]) {
+				*x = i;
+				*y = j;
+				return true;
+			}
+	return false;
 }
 
 /* solves the table using recursions */
