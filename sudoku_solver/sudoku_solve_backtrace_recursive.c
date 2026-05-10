@@ -13,12 +13,20 @@ int SUB;	// sub square length
 /* print the table including the division */
 void draw(int **puzzle, bool **guess)
 {
+	// get max cell width to draw table
+	int cell_width = 0;
+	for (int tmp = DIM; tmp > 0; tmp /= 10)
+		++cell_width;
+	// making number width dynamic
+	char strformat[10];
+	sprintf(strformat, "%%%dd", cell_width);
+
 	FOR (i) {
 		/* assuming the valid cell values are one digit, one for cell value
 		 * one for space after it and we need extra one for the first space
 		 * so it will be 2 * DIM + 1 */
 		if (! (i % SUB)) {
-			for (int r = 0; r < DIM * 2 + 1; ++r)
+			for (int r = 0; r < DIM * (cell_width + 1) + 1; ++r)
 				putchar('-');
 			putchar('\n');
 		}
@@ -28,11 +36,12 @@ void draw(int **puzzle, bool **guess)
 			// set output color to print guessed cells in different color
 			if (guess[i][j])
 				printf("\033[32m");
-			printf("%d\033[0m", puzzle[i][j]);
+			printf(strformat, puzzle[i][j]);
+			printf("\033[0m");
 		}
 		puts("|");
 	}
-	for (int r = 0; r < DIM * 2 + 1; ++r)
+	for (int r = 0; r < DIM * (cell_width + 1) + 1; ++r)
 		putchar('-');
 	putchar('\n');
 }
