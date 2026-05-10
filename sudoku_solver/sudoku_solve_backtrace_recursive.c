@@ -10,17 +10,16 @@
 int DIM;	// table length
 int SUB;	// sub square length
 
-/* print the table including the division */
-void draw(int **puzzle, bool **guess)
+/* print the board including the division */
+void print_board(int **puzzle, bool **guess)
 {
 	// get max cell width to draw table
 	int cell_width = 0;
 	for (int tmp = DIM; tmp > 0; tmp /= 10)
 		++cell_width;
-	// making number width dynamic
-	char strformat[10];
+	// making number width dynamic 5 chars are adequate upto 99 digits!
+	char strformat[5];
 	sprintf(strformat, "%%%dd", cell_width);
-
 	FOR (i) {
 		/* assuming the valid cell values are one digit, one for cell value
 		 * one for space after it and we need extra one for the first space
@@ -47,7 +46,7 @@ void draw(int **puzzle, bool **guess)
 }
 
 /* find the next blank cell to solve */
-bool find_free(int *x, int *y, int **puzzle)
+bool find_blank(int *x, int *y, int **puzzle)
 {
 	FOR(i)
 		FOR(j)
@@ -79,7 +78,7 @@ bool is_valid(int n, int x, int y, int **puzzle)
 bool solve(int **puzzle)
 {
 	int x, y;
-	if (!find_free(&x, &y, puzzle))
+	if (!find_blank(&x, &y, puzzle))
 		return true;
 
 	for(int i = 1; i <= DIM; ++i)
@@ -120,7 +119,7 @@ int main (void)
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
 
 	if (solve(puzzle))
-		draw(puzzle, guess);
+		print_board(puzzle, guess);
 	else
 		printf("I can not solve it! wow...\n");
 
