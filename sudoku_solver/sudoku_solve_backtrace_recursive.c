@@ -1,13 +1,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-#define DIM 9	// table length
-#define SUB 3	// sub square length
+#include <math.h>
 
 /* adding a macro for for loops iterating columns or rows */
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
+
+int DIM;	// table length
+int SUB;	// sub square length
 
 /* print the table including the division */
 void draw(int **puzzle, bool **guess)
@@ -23,7 +24,7 @@ void draw(int **puzzle, bool **guess)
 		}
 		// putting vertical dividers
 		FOR(j) {
-			putchar(!(j % SUB) ? '|' : ' ');
+		putchar(!(j % SUB) ? '|' : ' ');
 			// set output color to print guessed cells in different color
 			if (guess[i][j])
 				printf("\033[32m");
@@ -72,7 +73,7 @@ bool solve(int **puzzle)
 	if (!find_free(&x, &y, puzzle))
 		return true;
 
-	for(int i = 1; i <= 9; ++i)
+	for(int i = 1; i <= DIM; ++i)
 		if (is_valid(i, x, y, puzzle)) {
 			puzzle[x][y] = i;
 			if (solve(puzzle))
@@ -84,6 +85,10 @@ bool solve(int **puzzle)
 
 int main (void)
 {
+	scanf("%d", &DIM);
+	SUB = sqrt(DIM);
+	if (SUB * SUB != DIM) return 1;	// DIM must be a perfect square
+
 	/* allocate memory for getting input
 	 * pointer to each row is allocated */
 	int **puzzle = malloc(DIM * sizeof(int *));
@@ -100,7 +105,7 @@ int main (void)
 	bool **guess = malloc(DIM * sizeof(bool *));
 	if (!guess) return 1;
 	FOR(i) {
-		guess[i] = malloc(DIM * sizeof(bool *));
+		guess[i] = malloc(DIM * sizeof(bool));
 		if (!guess[i]) return 1;
 	}
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
@@ -111,7 +116,11 @@ int main (void)
 		printf("I can not solve it! wow...\n");
 
 	// free allocated heap
-	FOR(i) free(puzzle[i]);
+	FOR(i) {
+		free(puzzle[i]);
+		free(guess[i]);
+	}
 	free(puzzle);
+	free(guess);
 	return 0;
 }
