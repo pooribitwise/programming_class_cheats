@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stddef.h> // for size_t conversion warnings
 
 /* making ANSI escape codes windows compatible */
 #ifdef __linux__
@@ -93,8 +94,8 @@ static int pos = 0, numblanks;
 /* find the next blank cell to solve */
 Cell *find_blanks(int **puzzle)
 {
-	Cell *blanks = malloc(DIM * DIM * sizeof(Cell));
-	int count = 0;
+	Cell *blanks = malloc((size_t) DIM * (size_t) DIM * sizeof(Cell));
+	size_t count = 0;	// size_t to pass to qsort
 	FOR(i) FOR(j) if (!puzzle[i][j]) {
 		int opts = 0;
 		for (int n = 1; n <= DIM; ++n)
@@ -102,7 +103,7 @@ Cell *find_blanks(int **puzzle)
 		blanks[count++] = (Cell) {i, j, opts};
 	}
 	qsort(blanks, count, sizeof(Cell), cell_cmp);
-	numblanks = count;
+	numblanks = (int) count;
 	return blanks;
 }
 
@@ -128,26 +129,26 @@ bool solve(int **puzzle)
 int main (void)
 {
 	scanf("%d", &DIM);
-	SUB = sqrt(DIM);
+	SUB = (int) sqrt((double) DIM);
 	if (SUB * SUB != DIM) return 1;	// DIM must be a perfect square
 
 	/* allocate memory for getting input
 	 * pointer to each row is allocated */
-	int **puzzle = malloc(DIM * sizeof(int *));
+	int **puzzle = malloc((size_t) DIM * sizeof(int *));
 	if (!puzzle) return 1;	//manipulate NULL pointer
 	// now allocate rows and store its pointer in puzzle
 	FOR(i) {
-		puzzle[i] = malloc(DIM * sizeof(int));
+		puzzle[i] = malloc((size_t) DIM * sizeof(int));
 		if (!puzzle[i]) return 1;
 		FOR(j)
 			scanf("%d", puzzle[i] + j);
 	}
 
 	// keep guessed cells to know after solving the puzzle
-	bool **guess = malloc(DIM * sizeof(bool *));
+	bool **guess = malloc((size_t) DIM * sizeof(bool *));
 	if (!guess) return 1;
 	FOR(i) {
-		guess[i] = malloc(DIM * sizeof(bool));
+		guess[i] = malloc((size_t) DIM * sizeof(bool));
 		if (!guess[i]) return 1;
 	}
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
