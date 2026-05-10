@@ -79,11 +79,10 @@ int is_valid(int n, int x, int y)
 int solve()
 {
 	int x, y;
-	if (find_free(&x, &y) == 0)
+	if (!find_free(&x, &y))
 		return 1;
 
-
-	for (int i=1; i<=9; i++)
+	FOR(i)
 		if (is_valid(i, x, y)) {
 			puzzle[x][y] = i;
 			if (solve())
