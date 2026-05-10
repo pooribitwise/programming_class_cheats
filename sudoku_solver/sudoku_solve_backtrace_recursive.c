@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,11 +9,8 @@
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
 
-// keep guessed cells to know after solving the puzzle
-int guess[DIM][DIM];
-
 /* print the table including the division */
-void draw(int **puzzle)
+void draw(int **puzzle, bool **guess)
 {
 	FOR (i) {
 		/* assuming the valid cell values are one digit, one for cell value
@@ -46,7 +44,6 @@ int find_free(int *x, int *y, int **puzzle)
 			if (! puzzle[i][j]) {
 				*x = i;
 				*y = j;
-				guess[i][j] = 1;
 				return 1;
 			}
 	return 0;
@@ -98,8 +95,18 @@ int main (void)
 		FOR(j)
 			scanf("%d", puzzle[i] + j);
 	}
+
+	// keep guessed cells to know after solving the puzzle
+	bool **guess = malloc(DIM * sizeof(bool *));
+	if (!guess) return 1;
+	FOR(i) {
+		guess[i] = malloc(DIM * sizeof(bool *));
+		if (!guess[i]) return 1;
+	}
+	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
+
 	if (solve(puzzle))
-		draw(puzzle);
+		draw(puzzle, guess);
 	else
 		printf("I can not solve it! wow...\n");
 
