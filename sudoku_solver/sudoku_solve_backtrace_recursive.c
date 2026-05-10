@@ -7,7 +7,7 @@
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
 
-char puzzle[DIM][DIM] = {
+int puzzle[DIM][DIM] = {
 	{5, 3, 0, 0, 7, 0, 0, 0, 0},
 	{6, 0, 0, 1, 9, 5, 0, 0, 0},
 	{0, 9, 8, 0, 0, 0, 0, 6, 0},
@@ -20,7 +20,7 @@ char puzzle[DIM][DIM] = {
 };
 
 // keep guessed cells to know after solving the puzzle
-char guess[DIM][DIM];
+int guess[DIM][DIM];
 
 void draw()
 {
