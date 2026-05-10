@@ -1,6 +1,13 @@
 #include <stdio.h>
 
-char puzzle[9][9] = {
+#define DIM 9	// table length
+#define SUB 3	// sub square length
+
+/* adding a macro for for loops iterating columns or rows */
+#define FOR(var) \
+	for (int var = 0; var < DIM; ++var)
+
+char puzzle[DIM][DIM] = {
 	{5, 3, 0, 0, 7, 0, 0, 0, 0},
 	{6, 0, 0, 1, 9, 5, 0, 0, 0},
 	{0, 9, 8, 0, 0, 0, 0, 6, 0},
@@ -13,32 +20,36 @@ char puzzle[9][9] = {
 };
 
 // keep guessed cells to know after solving the puzzle
-char guess[9][9];
+char guess[DIM][DIM];
 
 void draw()
 {
-	printf(" ----------------------- \n");
-
-	for (int i=0; i<9; i++) {
-		for (int j=0; j<9; j++) {
-			if (j % 3 == 0)
-				printf("| ");
-
+	FOR (i) {
+		/* assuming the valid cell values are one digit, one for cell value
+		 * one for space after it and we need extra one for the first space
+		 * so it will be 2 * DIM + 1 */
+		if (! (i % SUB)) {
+			for (int r = 0; r < DIM * 2 + 1; ++r)
+				putchar('-');
+			putchar('\n');
+		}
+		// putting vertical dividers
+		FOR(j) {
+			putchar(!(j % SUB) ? '|' : ' ');
 			// set output color to print guessed cells in different color
 			if (guess[i][j])
 				printf("\033[32m");
 			
-			printf("%d ", puzzle[i][j]);
+			printf("%d", puzzle[i][j]);
 
 			// reset the output color
 			printf("\033[0m");
 		}
-
-		if ((i+1) % 3 == 0)
-			printf("| \n ----------------------- \n");
-		else
-			printf("| \n");
+		puts("|");
 	}
+	for (int r = 0; r < DIM * 2 + 1; ++r)
+		putchar('-');
+	putchar('\n');
 }
 
 char find_free(int *x, int *y)
