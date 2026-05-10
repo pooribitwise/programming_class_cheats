@@ -11,6 +11,7 @@
 // keep guessed cells to know after solving the puzzle
 int guess[DIM][DIM];
 
+/* print the table including the division */
 void draw(int **puzzle)
 {
 	FOR (i) {
@@ -37,6 +38,7 @@ void draw(int **puzzle)
 	putchar('\n');
 }
 
+/* find the next blank cell to solve */
 int find_free(int *x, int *y, int **puzzle)
 {
 	FOR(i)
@@ -50,6 +52,7 @@ int find_free(int *x, int *y, int **puzzle)
 	return 0;
 }
 
+/* check if n can be placed in row x and col y */
 int is_valid(int n, int x, int y, int **puzzle)
 {
 	FOR(i)
@@ -65,6 +68,7 @@ int is_valid(int n, int x, int y, int **puzzle)
 	return 1;
 }
 
+/* solves the table using recursions */
 int solve(int **puzzle)
 {
 	int x, y;
@@ -81,10 +85,13 @@ int solve(int **puzzle)
 	return 0;
 }
 
-int main ()
+int main (void)
 {
+	/* allocate memory for getting input
+	 * pointer to each row is allocated */
 	int **puzzle = malloc(DIM * sizeof(int *));
 	if (!puzzle) return 1;	//manipulate NULL pointer
+	// now allocate rows and store its pointer in puzzle
 	FOR(i) {
 		puzzle[i] = malloc(DIM * sizeof(int));
 		if (!puzzle[i]) return 1;
@@ -94,8 +101,9 @@ int main ()
 	if (solve(puzzle))
 		draw(puzzle);
 	else
-		printf("I can not solve it! wow....\n");
+		printf("I can not solve it! wow...\n");
 
+	// free allocated heap
 	FOR(i) free(puzzle[i]);
 	free(puzzle);
 	return 0;
