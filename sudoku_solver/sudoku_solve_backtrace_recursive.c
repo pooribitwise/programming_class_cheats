@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #define DIM 9	// table length
 #define SUB 3	// sub square length
@@ -7,22 +8,10 @@
 #define FOR(var) \
 	for (int var = 0; var < DIM; ++var)
 
-int puzzle[DIM][DIM] = {
-	{5, 3, 0, 0, 7, 0, 0, 0, 0},
-	{6, 0, 0, 1, 9, 5, 0, 0, 0},
-	{0, 9, 8, 0, 0, 0, 0, 6, 0},
-	{8, 0, 0, 0, 6, 0, 0, 0, 3},
-	{4, 0, 0, 8, 0, 3, 0, 0, 1},
-	{7, 0, 0, 0, 2, 0, 0, 0, 6},
-	{0, 6, 0, 0, 0, 0, 2, 8, 0},
-	{0, 0, 0, 4, 1, 9, 0, 0, 5},
-	{0, 0, 0, 0, 8, 0, 0, 7, 9}
-};
-
 // keep guessed cells to know after solving the puzzle
 int guess[DIM][DIM];
 
-void draw()
+void draw(int **puzzle)
 {
 	FOR (i) {
 		/* assuming the valid cell values are one digit, one for cell value
@@ -48,7 +37,7 @@ void draw()
 	putchar('\n');
 }
 
-int find_free(int *x, int *y)
+int find_free(int *x, int *y, int **puzzle)
 {
 	FOR(i)
 		FOR(j)
@@ -61,7 +50,7 @@ int find_free(int *x, int *y)
 	return 0;
 }
 
-int is_valid(int n, int x, int y)
+int is_valid(int n, int x, int y, int **puzzle)
 {
 	FOR(i)
 		if (puzzle[x][i] == n || puzzle[i][y] == n)
@@ -76,16 +65,16 @@ int is_valid(int n, int x, int y)
 	return 1;
 }
 
-int solve()
+int solve(int **puzzle)
 {
 	int x, y;
-	if (!find_free(&x, &y))
+	if (!find_free(&x, &y, puzzle))
 		return 1;
 
-	FOR(i)
-		if (is_valid(i, x, y)) {
+	for(int i = 1; i <= 9; ++i)
+		if (is_valid(i, x, y, puzzle)) {
 			puzzle[x][y] = i;
-			if (solve())
+			if (solve(puzzle))
 				return 1;
 			puzzle[x][y] = 0;
 		}
@@ -94,9 +83,20 @@ int solve()
 
 int main ()
 {
-	if (solve())
-		draw();
+	int **puzzle = malloc(DIM * sizeof(int *));
+	if (!puzzle) return 1;	//manipulate NULL pointer
+	FOR(i) {
+		puzzle[i] = malloc(DIM * sizeof(int));
+		if (!puzzle[i]) return 1;
+		FOR(j)
+			scanf("%d", puzzle[i] + j);
+	}
+	if (solve(puzzle))
+		draw(puzzle);
 	else
 		printf("I can not solve it! wow....\n");
+
+	FOR(i) free(puzzle[i]);
+	free(puzzle);
 	return 0;
 }
