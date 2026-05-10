@@ -61,7 +61,7 @@ void print_board(int **puzzle, bool **guess)
 bool is_valid(int n, int x, int y, int **puzzle)
 {
 	FOR(i)
-		if (puzzle[x][i] == n || puzzle[i][y] == n)
+		if (i != x && (puzzle[x][i] == n || puzzle[i][y] == n))
 			return false;
 
 	int x_square = x / SUB * SUB;
@@ -89,7 +89,7 @@ int cell_cmp(const void *a, const void *b) {
 }
 
 static Cell *order;
-static int pos = 0, numblanks;
+static int numblanks;
 
 /* find the next blank cell to solve */
 Cell *find_blanks(int **puzzle)
@@ -107,20 +107,37 @@ Cell *find_blanks(int **puzzle)
 	return blanks;
 }
 
-/* solves the table using recursions */
+/* solves the table using recursions
+ * BUGFIX!
+ * when the table was empty except the last columns like:
+ * 0 0 0  0 0 0  0 0 0
+ * 0 0 0  0 0 0  0 0 0
+ * 0 0 0  0 0 0  0 0 0
+ *
+ * 0 0 0  0 0 0  0 0 0
+ * 0 0 0  0 0 0  0 0 0
+ * 0 0 0  0 0 0  0 0 0
+ *
+ * 0 0 0  0 0 0  0 4 7
+ * 0 0 0  0 0 0  0 5 8
+ * 0 0 0  0 0 0  0 6 9
+ * the process stalls, and therfore best options must be checked
+ * for each blank cell we want to fill! */
 bool solve(int **puzzle)
 {
-	if (pos >= numblanks)
+	free(order);
+	order = find_blanks(puzzle);
+	if (numblanks == 0)
 		return true;
 
-	int x = order[pos].x, y = order[pos].y;
+	int x = order[0].x;
+	int y = order[0].y;
+
 	for(int i = 1; i <= DIM; ++i)
 		if (is_valid(i, x, y, puzzle)) {
 			puzzle[x][y] = i;
-			++pos;
 			if (solve(puzzle))
 				return true;
-			--pos;
 			puzzle[x][y] = 0;
 		}
 	return false;
@@ -152,10 +169,6 @@ int main (void)
 		if (!guess[i]) return 1;
 	}
 	FOR(i) FOR(j) guess[i][j] = puzzle[i][j] ? false : true;
-
-	order = find_blanks(puzzle);
-	if (!order) return 1;
-	pos = 0;
 
 	bool solved = solve(puzzle);
 	if (solved)
